@@ -36,7 +36,6 @@ runs:
     - name: Install test-only-changed
       shell: bash
       run: |
-          composer global config minimum-stability dev
           composer global require cnimmo/test-only-changed
           composer global config bin-dir --absolute --quiet
 

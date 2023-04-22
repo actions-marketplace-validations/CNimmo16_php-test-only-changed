@@ -29,7 +29,5 @@ jobs:
 
       - uses: CNimmo16/php-test-only-changed@main
         with:
-          branch-name: main
-          workflow-id: example
           ignore-paths: vendor
           tests-directory: tests

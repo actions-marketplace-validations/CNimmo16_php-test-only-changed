@@ -8,7 +8,7 @@ final class RelatedTestsFinderTest extends TestCase
 {
     public function testPasses(): void
     {
-        $this->assertTrue(true);
+        $this->assertTrue(false);
     }
 }
 

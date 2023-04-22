@@ -8,7 +8,7 @@ inputs:
   tests-directory:
     description: 'The directory where the tests are located relative to the root. Defaults to tests.'
     default: tests
-  ignore-files:
+  ignore-paths:
     description: 'Files to ignore when determining which files to run.'
     default: 'vendor,node_modules,_ide_helper.php'
 runs:
@@ -22,7 +22,7 @@ runs:
       uses: nrwl/nx-set-shas@v3
       id: last_successful_commit
       with:
-        main-branch-name: ${{ inputs.branch-name || steps.branch-name.outputs.branch_name }}
+        main-branch-name: ${{ inputs.branch-name || steps.branch-name.outputs.current_branch }}
         workflow-id: ${{ inputs.workflow-id }}
         error-on-no-successful-workflow: false
 
@@ -32,7 +32,14 @@ runs:
       with:
         base_sha: ${{ steps.last_successful_commit.outputs.base }}
         separator: ','
+        
+    - name: Install test-only-changed
+      shell: bash
+      run: |
+          composer global config minimum-stability dev
+          composer global require cnimmo/test-only-changed
+          composer global config bin-dir --absolute --quiet
 
     - name: Run paratest on changed files
       shell: bash
-      run: vendor/bin/test-only-changed --allow-missing --ignore=${{ inputs.ignore-files }} --tests-directory=${{ inputs.tests-directory }} --changed-files=${{ steps.changes_since_successful_commit.outputs.all_changed_and_modified_files }}
+      run: /home/runner/.composer/vendor/bin/test-only-changed --allow-missing --ignore=${{ inputs.ignore-paths }} --tests-directory=${{ inputs.tests-directory }} --changed-files=${{ steps.changes_since_successful_commit.outputs.all_changed_and_modified_files }}

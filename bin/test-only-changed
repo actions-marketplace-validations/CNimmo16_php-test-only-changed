@@ -12,8 +12,7 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     exit(1);
 }
 
-use Cnimmo\GranularTestsuites\TestsuiteGranulariser;
-use Cnimmo\ListDeps\DependencyFinder;
+use Cnimmo\TestOnlyChanged\RelatedTestsFinder;
 
 $opts = getopt('c:p:r:', ['changed-files:', 'config-path', 'paths:', 'root:', 'allow-missing', 'ignore:', 'tests-directory:']);
 
@@ -21,7 +20,7 @@ $testConfigPath = $opts['c'] ?? $opts['config-path'] ?? null;
 $pathOptionValue = $opts['p'] ?? $opts['paths'] ?? null;
 $rootPath = $opts['r'] ?? $opts['root'] ?? null;
 $allowMissing = isset($opts['allow-missing']) ? true : false;
-$ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : ['vendor', '_ide_helper.php'];
+$ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : array_map('realpath', ['vendor', '_ide_helper.php']);
 $testsDirectory = $opts['tests-directory'] ?? 'tests';
 $changedFiles = isset($opts['changed-files']) ? explode(',', $opts['changed-files']) : null;
 
@@ -32,43 +31,19 @@ if (!isset($testConfigPath)) {
 
 if (!$changedFiles) {
     $changedFiles = [];
-    exec('git diff --name-only', $changedFiles);
+    exec('git ls-files --others --modified --deleted --exclude-standard', $changedFiles);
 }
-$changedFiles = array_map('realpath', $changedFiles);
+$changedFiles = array_filter(array_map('realpath', array_unique($changedFiles)));
 
-$tmpConfigFile = tmpfile();
-
-$granulariser = new TestsuiteGranulariser($testConfigPath);
-$xml = $granulariser->granularise('./phpunit.generated.xml', true);
-
-$unchangedTestFilePaths = [];
-$changedTestFilePaths = [];
-foreach ($granulariser->allTestFilePaths as $testFilePath) {
-    if (in_array(realpath($testFilePath), $changedFiles)) {
-        $changedTestFilePaths[] = $testFilePath;
-    } else {
-        $unchangedTestFilePaths[] = $testFilePath;
-    }
-}
-
-$dependenciesByTestFile = (new DependencyFinder($rootPath, $ignorePaths, $unchangedTestFilePaths, $allowMissing))->findDependencies();
-
-$testFilesToRun = [
-    ...array_keys(
-        array_filter($dependenciesByTestFile, function ($dependentFiles) use ($changedFiles) {
-            $isDependent = count(array_intersect($changedFiles, $dependentFiles)) >= 1;
-            return $isDependent;
-        })
-    ),
-    ...$changedTestFilePaths
-];
+$finder = new RelatedTestsFinder($testConfigPath);
+$testFilesToRun = $finder->findRelatedTests($changedFiles, $rootPath, $ignorePaths, $allowMissing);
 
 if (count($testFilesToRun) === 0) {
     echo 'No tests to run' . PHP_EOL;
     exit(0);
 }
 
-echo '> Running ' . count($testFilesToRun) . ' tests out of total ' . count($granulariser->allTestFilePaths) . PHP_EOL;
+echo '> Running ' . count($testFilesToRun) . ' tests out of total ' . count($finder->granulariser->allTestFilePaths) . PHP_EOL;
 
 $paratestCmdLoc = getcwd() . '/vendor/bin/paratest';
 

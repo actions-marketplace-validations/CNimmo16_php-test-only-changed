@@ -1,0 +1,22 @@
+{
+    "name": "cnimmo/test-only-changed",
+    "description": "Run Paratest on only changed files",
+    "license": "MIT",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Cnimmo\\TestOnlyChanged\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "CNimmo16",
+            "email": "48329714+CNimmo16@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "cnimmo/list-deps": "dev-main",
+        "cnimmo/granular-testsuites": "dev-main"
+    },
+    "bin": ["bin/test-only-changed"]
+}

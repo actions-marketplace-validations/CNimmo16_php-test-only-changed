@@ -1,0 +1,164 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "618739613c74a25827b8bd3b8f09abe7",
+    "packages": [
+        {
+            "name": "cnimmo/granular-testsuites",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CNimmo16/php-granular-testsuites.git",
+                "reference": "b04d60d6ec67a3468c4512189f3b581d1f2aff3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CNimmo16/php-granular-testsuites/zipball/b04d60d6ec67a3468c4512189f3b581d1f2aff3b",
+                "reference": "b04d60d6ec67a3468c4512189f3b581d1f2aff3b",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "bin": [
+                "bin/granular-testsuites"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cnimmo\\GranularTestsuites\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CNimmo16",
+                    "email": "48329714+CNimmo16@users.noreply.github.com"
+                }
+            ],
+            "description": "Take an existing phpunit XML config and generate a new config containing a standalone testsuite for each test file within the original testsuites.",
+            "support": {
+                "issues": "https://github.com/CNimmo16/php-granular-testsuites/issues",
+                "source": "https://github.com/CNimmo16/php-granular-testsuites/tree/main"
+            },
+            "time": "2023-04-22T19:49:59+00:00"
+        },
+        {
+            "name": "cnimmo/list-deps",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CNimmo16/php-list-deps.git",
+                "reference": "2849c570d2c8b404772e405fd99840307e20fe63"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CNimmo16/php-list-deps/zipball/2849c570d2c8b404772e405fd99840307e20fe63",
+                "reference": "2849c570d2c8b404772e405fd99840307e20fe63",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "^4.15",
+                "php": ">=7.4"
+            },
+            "default-branch": true,
+            "bin": [
+                "bin/list-deps"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cnimmo\\ListDeps\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CNimmo16",
+                    "email": "48329714+CNimmo16@users.noreply.github.com"
+                }
+            ],
+            "description": "Find the namespaced dependency references of a given file",
+            "support": {
+                "issues": "https://github.com/CNimmo16/php-list-deps/issues",
+                "source": "https://github.com/CNimmo16/php-list-deps/tree/main"
+            },
+            "time": "2023-04-22T20:22:42+00:00"
+        },
+        {
+            "name": "nikic/php-parser",
+            "version": "v4.15.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/PHP-Parser.git",
+                "reference": "6bb5176bc4af8bcb7d926f88718db9b96a2d4290"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/6bb5176bc4af8bcb7d926f88718db9b96a2d4290",
+                "reference": "6bb5176bc4af8bcb7d926f88718db9b96a2d4290",
+                "shasum": ""
+            },
+            "require": {
+                "ext-tokenizer": "*",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "ircmaxell/php-yacc": "^0.0.7",
+                "phpunit/phpunit": "^6.5 || ^7.0 || ^8.0 || ^9.0"
+            },
+            "bin": [
+                "bin/php-parse"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.9-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PhpParser\\": "lib/PhpParser"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov"
+                }
+            ],
+            "description": "A PHP parser written in PHP",
+            "keywords": [
+                "parser",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/nikic/PHP-Parser/issues",
+                "source": "https://github.com/nikic/PHP-Parser/tree/v4.15.4"
+            },
+            "time": "2023-03-05T19:49:14+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "cnimmo/list-deps": 20,
+        "cnimmo/granular-testsuites": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}

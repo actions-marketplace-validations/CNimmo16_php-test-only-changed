@@ -1,0 +1,69 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+if (file_exists(__DIR__.'/../vendor/autoload.php')) {
+    require __DIR__.'/../vendor/autoload.php';
+} elseif (file_exists(__DIR__.'/../../../autoload.php')) {
+    require __DIR__.'/../../../autoload.php';
+} else {
+    echo 'Run "composer install" in order to install the necessary dependencies.'.PHP_EOL;
+    exit(1);
+}
+
+use Cnimmo\GranularTestsuites\TestsuiteGranulariser;
+use Cnimmo\ListDeps\DependencyFinder;
+
+$opts = getopt('c:p:r:', ['config-path', 'paths:', 'root:', 'allow-missing', 'ignore:', 'tests-directory:']);
+
+$testConfigPath = $opts['c'] ?? $opts['config-path'] ?? null;
+$pathOptionValue = $opts['p'] ?? $opts['paths'] ?? null;
+$rootPath = $opts['r'] ?? $opts['root'] ?? null;
+$allowMissing = isset($opts['allow-missing']) ? true : false;
+$ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : [];
+$testsDirectory = $opts['tests-directory'] ?? 'tests';
+
+if (!isset($testConfigPath)) {
+    echo 'Config file not specified. Defaulting to phpunit.xml'.PHP_EOL;
+    $testConfigPath = getcwd() . '/phpunit.xml';
+}
+
+$changedFiles = [];
+exec('git diff --name-only', $changedFiles);
+$changedFiles = array_map('realpath', $changedFiles);
+
+$tmpConfigFile = tmpfile();
+
+$granulariser = new TestsuiteGranulariser($testConfigPath);
+$xml = $granulariser->granularise('./phpunit.gen.xml', true);
+
+$unchangedTestFilePaths = [];
+$changedTestFilePaths = [];
+foreach ($granulariser->allTestFilePaths as $testFilePath) {
+    if (in_array($testFilePath, $changedFiles)) {
+        $changedTestFilePaths[] = $testFilePath;
+    } else {
+        $unchangedTestFilePaths[] = $testFilePath;
+    }
+}
+
+$dependenciesByTestFile = (new DependencyFinder($rootPath, $ignorePaths, $unchangedTestFilePaths, $allowMissing))->findDependencies();
+
+$testFilesToRun = array_keys(
+    array_filter($dependenciesByTestFile, function ($dependentFiles) use ($changedFiles) {
+        $isDependent = count(array_intersect($changedFiles, $dependentFiles)) >= 1;
+        return $isDependent;
+    })
+);
+
+echo '> Running ' . count($testFilesToRun) . ' tests out of total ' . count($granulariser->allTestFilePaths) . PHP_EOL;
+
+$paratestCmdLoc = getcwd() . '/vendor/bin/paratest';
+
+$cmd = "$paratestCmdLoc --configuration ./phpunit.gen.xml --testsuite " . implode(',', $testFilesToRun);
+
+$resultCode;
+passthru($cmd, $resultCode);
+
+exit($resultCode);

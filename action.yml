@@ -1,0 +1,42 @@
+name: 'php test changed files'
+description: 'Run only changed PHP unit test files using Paratest'
+inputs:
+  branch-name:
+    description: 'Name of branch to scan for last successful workflow run. Defaults to current branch.'
+    default: ${{ steps.branch-name.outputs.current_branch }}
+  workflow-id:
+    description: 'Name of workflow to check for success. Defaults to current workflow.'
+  tests-directory:
+    description: 'The directory where the tests are located relative to the root. Defaults to tests.'
+    default: tests
+  ignore-files:
+    description: 'Files to ignore when determining which files to run.'
+    default: 'vendor,node_modules,_ide_helper.php,${{ inputs.tests-directory }}'
+outputs:
+  random-number:
+    description: "Random number"
+    value: ${{ steps.random-number-generator.outputs.random-number }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v6
+
+    - name: Get last successful commit
+      uses: nrwl/nx-set-shas@v3
+      id: last_successful_commit
+      with:
+        main-branch-name: test-only-changed
+        workflow-id: ${{ inputs.workflow-id }}
+        error-on-no-successful-workflow: false
+
+    - name: Run changed-files with the commit of the last successful test workflow run
+      id: changes_since_successful_commit
+      uses: tj-actions/changed-files@v35
+      with:
+        base_sha: ${{ steps.last_successful_commit.outputs.base }}
+        separator: ','
+
+    - name: Run paratest on changed files
+      run: vendor/bin/php-test-only-changed --allow-missing --ignore=${{ inputs.ignore-files }} --tests-directory=${{ inputs.tests-directory }}

@@ -39,4 +39,4 @@ runs:
         separator: ','
 
     - name: Run paratest on changed files
-      run: vendor/bin/test-only-changed --allow-missing --ignore=${{ inputs.ignore-files }} --tests-directory=${{ inputs.tests-directory }}
+      run: vendor/bin/test-only-changed --allow-missing --ignore=${{ inputs.ignore-files }} --tests-directory=${{ inputs.tests-directory }} --changed-files=${{ steps.changes_since_successful_commit.outputs.all_changed_and_modified_files }}

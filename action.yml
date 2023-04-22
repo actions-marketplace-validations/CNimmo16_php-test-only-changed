@@ -1,5 +1,8 @@
 name: 'Run PHP tests on changed files'
 description: 'Run only changed PHP unit test files using Paratest'
+branding:
+  icon: 'filter'
+  color: 'green'
 inputs:
   branch-name:
     description: 'Name of branch to scan for last successful workflow run. Defaults to current branch.'

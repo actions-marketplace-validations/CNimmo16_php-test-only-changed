@@ -21,7 +21,7 @@ $testConfigPath = $opts['c'] ?? $opts['config-path'] ?? null;
 $pathOptionValue = $opts['p'] ?? $opts['paths'] ?? null;
 $rootPath = $opts['r'] ?? $opts['root'] ?? null;
 $allowMissing = isset($opts['allow-missing']) ? true : false;
-$ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : [];
+$ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : ['vendor', '_ide_helper.php'];
 $testsDirectory = $opts['tests-directory'] ?? 'tests';
 
 if (!isset($testConfigPath)) {
@@ -56,6 +56,11 @@ $testFilesToRun = array_keys(
         return $isDependent;
     })
 );
+
+if (count($testFilesToRun) === 0) {
+    echo 'No tests to run' . PHP_EOL;
+    exit(0);
+}
 
 echo '> Running ' . count($testFilesToRun) . ' tests out of total ' . count($granulariser->allTestFilePaths) . PHP_EOL;
 

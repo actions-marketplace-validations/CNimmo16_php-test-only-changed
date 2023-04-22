@@ -53,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/CNimmo16/php-list-deps.git",
-                "reference": "2849c570d2c8b404772e405fd99840307e20fe63"
+                "reference": "ffa3d8ddbf2e8c272abab7e87b54f9f1b6f15851"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CNimmo16/php-list-deps/zipball/2849c570d2c8b404772e405fd99840307e20fe63",
-                "reference": "2849c570d2c8b404772e405fd99840307e20fe63",
+                "url": "https://api.github.com/repos/CNimmo16/php-list-deps/zipball/ffa3d8ddbf2e8c272abab7e87b54f9f1b6f15851",
+                "reference": "ffa3d8ddbf2e8c272abab7e87b54f9f1b6f15851",
                 "shasum": ""
             },
             "require": {
@@ -90,7 +90,7 @@
                 "issues": "https://github.com/CNimmo16/php-list-deps/issues",
                 "source": "https://github.com/CNimmo16/php-list-deps/tree/main"
             },
-            "time": "2023-04-22T20:22:42+00:00"
+            "time": "2023-04-22T21:35:03+00:00"
         },
         {
             "name": "nikic/php-parser",

@@ -15,7 +15,7 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
 use Cnimmo\GranularTestsuites\TestsuiteGranulariser;
 use Cnimmo\ListDeps\DependencyFinder;
 
-$opts = getopt('c:p:r:', ['config-path', 'paths:', 'root:', 'allow-missing', 'ignore:', 'tests-directory:']);
+$opts = getopt('c:p:r:', ['changed-files:', 'config-path', 'paths:', 'root:', 'allow-missing', 'ignore:', 'tests-directory:']);
 
 $testConfigPath = $opts['c'] ?? $opts['config-path'] ?? null;
 $pathOptionValue = $opts['p'] ?? $opts['paths'] ?? null;
@@ -23,25 +23,28 @@ $rootPath = $opts['r'] ?? $opts['root'] ?? null;
 $allowMissing = isset($opts['allow-missing']) ? true : false;
 $ignorePaths = isset($opts['ignore']) ? explode(',', $opts['ignore']) : ['vendor', '_ide_helper.php'];
 $testsDirectory = $opts['tests-directory'] ?? 'tests';
+$changedFiles = isset($opts['changed-files']) ? explode(',', $opts['changed-files']) : null;
 
 if (!isset($testConfigPath)) {
     echo 'Config file not specified. Defaulting to phpunit.xml'.PHP_EOL;
     $testConfigPath = getcwd() . '/phpunit.xml';
 }
 
-$changedFiles = [];
-exec('git diff --name-only', $changedFiles);
+if (!$changedFiles) {
+    $changedFiles = [];
+    exec('git diff --name-only', $changedFiles);
+}
 $changedFiles = array_map('realpath', $changedFiles);
 
 $tmpConfigFile = tmpfile();
 
 $granulariser = new TestsuiteGranulariser($testConfigPath);
-$xml = $granulariser->granularise('./phpunit.gen.xml', true);
+$xml = $granulariser->granularise('./phpunit.generated.xml', true);
 
 $unchangedTestFilePaths = [];
 $changedTestFilePaths = [];
 foreach ($granulariser->allTestFilePaths as $testFilePath) {
-    if (in_array($testFilePath, $changedFiles)) {
+    if (in_array(realpath($testFilePath), $changedFiles)) {
         $changedTestFilePaths[] = $testFilePath;
     } else {
         $unchangedTestFilePaths[] = $testFilePath;
@@ -50,12 +53,15 @@ foreach ($granulariser->allTestFilePaths as $testFilePath) {
 
 $dependenciesByTestFile = (new DependencyFinder($rootPath, $ignorePaths, $unchangedTestFilePaths, $allowMissing))->findDependencies();
 
-$testFilesToRun = array_keys(
-    array_filter($dependenciesByTestFile, function ($dependentFiles) use ($changedFiles) {
-        $isDependent = count(array_intersect($changedFiles, $dependentFiles)) >= 1;
-        return $isDependent;
-    })
-);
+$testFilesToRun = [
+    ...array_keys(
+        array_filter($dependenciesByTestFile, function ($dependentFiles) use ($changedFiles) {
+            $isDependent = count(array_intersect($changedFiles, $dependentFiles)) >= 1;
+            return $isDependent;
+        })
+    ),
+    ...$changedTestFilePaths
+];
 
 if (count($testFilesToRun) === 0) {
     echo 'No tests to run' . PHP_EOL;
@@ -66,7 +72,7 @@ echo '> Running ' . count($testFilesToRun) . ' tests out of total ' . count($gra
 
 $paratestCmdLoc = getcwd() . '/vendor/bin/paratest';
 
-$cmd = "$paratestCmdLoc --configuration ./phpunit.gen.xml --testsuite " . implode(',', $testFilesToRun);
+$cmd = "$paratestCmdLoc --configuration ./phpunit.generated.xml --testsuite " . implode(',', $testFilesToRun);
 
 $resultCode;
 passthru($cmd, $resultCode);

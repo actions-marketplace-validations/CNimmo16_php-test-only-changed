@@ -1,4 +1,4 @@
-name: 'php test changed files'
+name: 'Run PHP tests on changed files'
 description: 'Run only changed PHP unit test files using Paratest'
 inputs:
   branch-name:

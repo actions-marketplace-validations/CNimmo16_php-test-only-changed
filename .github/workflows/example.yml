@@ -1,0 +1,32 @@
+name: example
+
+on:
+  push:
+
+jobs:
+
+  phpunittest:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version:
+          - '8.1'
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          ini-values: zend.assertions=1
+
+      - name: Install php deps
+        run: |
+          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+          composer require cnimmo/test-only-changed
+
+      - name: Run tests on changed files
+        uses: CNimmo16/php-test-only-changed@0.1.0
